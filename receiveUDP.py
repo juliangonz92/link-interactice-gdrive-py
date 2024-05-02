@@ -6,7 +6,7 @@ import datetime
 
 buffersize = 1024
 
-serverIP = '192.168.20.23'
+serverIP = '10.1.1.191'
 severport = 5000
 
 def write_log(log_message, *args, **kwargs):

@@ -1,5 +1,4 @@
 import os.path
-
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -7,7 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
-# If modifying these scopes, delete the file token.json.
+# If the scopes are modified, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 def get_service():
@@ -32,8 +31,6 @@ def get_service():
 
     return service
 
-
-
 def search_folder_by_name(folder_name, service):
     query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder'"
     results = service.files().list(q=query, fields="nextPageToken, files(id, name)").execute()
@@ -43,18 +40,25 @@ def search_folder_by_name(folder_name, service):
         return None
     return items[0]['id']
 
+def create_folder(folder_name, service):
+    file_metadata = {
+            'name': folder_name,
+            'mimeType': 'application/vnd.google-apps.folder'
+        }
+    return service.files().create(body=file_metadata, fields='id, name').execute()
 
 def upload_file_drive(path, name):
     try:
         service = get_service()
-        folder_id = search_folder_by_name('superwurdfolder', service)
+        folder_name = f"Croydon_Jail_images"
+        folder_id = search_folder_by_name(folder_name, service)
         if not folder_id:
-            print("Folder not found, uploading file to root directory.")
-            folder_id = None
+            folder_id = create_folder(folder_name, service)['id']
 
         file_metadata = {'name': name}
         if folder_id:
             file_metadata['parents'] = [folder_id]
+            
         media = MediaFileUpload(path, mimetype='image/jpg')
         file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
 
