@@ -19,7 +19,7 @@ def upload():
 
     file = request.files['image']
     now = datetime.datetime.now()
-    filename = f"{now.strftime('%Y-%m-%d %H-%M-%S')}-{file.filename}"
+    filename = f"{file.filename}"
     file.save(os.path.join(dir_actual, filename))
 
     try:
